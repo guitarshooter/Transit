@@ -18,7 +18,10 @@ $mech->submit_form(
 form_name => "search",
 fields => {
 from => $train_from,
-to => $train_to
+to => $train_to,
+hh => "06",
+m1 => "0",
+m2 => "5"
 }
 );
 
