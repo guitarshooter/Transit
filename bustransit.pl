@@ -3,6 +3,7 @@
 use WWW::Mechanize;
 use Data::Dumper;
 use HTML::TreeBuilder;
+use Time::Piece;
 use utf8;
 
 my $url = 'http://transfer.navitime.biz/bus-navi/pc/transfer/TransferTop';
@@ -26,21 +27,15 @@ $txt = $mech->content;
 my $tree = HTML::TreeBuilder->new;
 $tree->parse($txt);
 $table = $tree->look_down("class","result_area_table");
+@time = $tree->look_down("class","result_area_tr");
 print $table->as_HTML;
-#foreach $tag (@table){
-#  print $tag->as_HTML,"\n";
-#}
+$lasttime = pop(@time);
+$lasttimestr = $lasttime->find('td')->as_text;
+$lasttimestr =~ s/着//g;
+print $lasttimestr;
+$date1 = localtime->strptime($lasttimestr,'%H:%M');
+$date1 += 60*10;
+print $date1->strftime('%H:%M');
 
-#print $txt;
 exit;
-
-@line = split("\n",$txt); #ページを行で分割
-@btn = ();
-
-foreach $row (@line){
-if($row =~ m/javascript:PostBack_Btn1\((.+?)\)/){ #配信結果IDを取得
-$no = $1;
-push(@btn,$no);
-}
-}
 
