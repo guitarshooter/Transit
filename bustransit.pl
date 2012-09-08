@@ -19,7 +19,9 @@ $mech->submit_form(
 form_name => "train",
 fields => {
 orvName => $bus_from,
-dnvName => $bus_to
+dnvName => $bus_to,
+hour => "18",
+minute => "10"
 }
 );
 
@@ -27,7 +29,7 @@ $txt = $mech->content;
 my $tree = HTML::TreeBuilder->new;
 $tree->parse($txt);
 $table = $tree->look_down("class","result_area_table");
-@time = $tree->look_down("class","result_area_tr");
+@time = $table->look_down("class","result_area_tr");
 print $table->as_HTML;
 $lasttime = pop(@time);
 $lasttimestr = $lasttime->find('td')->as_text;
