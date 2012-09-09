@@ -3,7 +3,14 @@ require 'rubygems'
 require 'mechanize'
 require 'kconv'
 require 'date'
+require 'sinatra'
+require 'sinatra/reloader'
 
+helpers do
+  include Rack::Utils; alias_method :h, :escape_html
+end
+
+get '/' do
 busurl = 'http://transfer.navitime.biz/bus-navi/pc/transfer/TransferTop'
 trainurl = 'http://transit.loco.yahoo.co.jp'
 bus_from = '宇津木台中央'
@@ -48,7 +55,7 @@ bus_text = bus_text.sub(' width="240" class="result_area_fare_td2" align="right"
 time_elem = bus_elem.search("tr[@class='result_area_tr']")
 bus_arvtime = time_elem.pop.at('td').inner_text
 bus_arvtime = bus_arvtime.sub("着","")
-puts bus_text
+bus_text
 date = Time.strptime(bus_arvtime,"%H:%M")
 date = date + 10*60
 #puts date.strftime("%H:%M")
@@ -71,4 +78,5 @@ elem = agent.page.at("[@class='route']")
 #puts agent.page.at("[@class='route-head']")
 train_text = elem.inner_html
 train_text = '<div class="route">' + train_text + '</div>'
-puts train_text
+train_text
+end
