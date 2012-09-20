@@ -11,19 +11,6 @@ helpers do
   include Rack::Utils; alias_method :h, :escape_html
 end
 
-#template :layout do
-#'<html>
-#<head>
-#<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-#<link rel="stylesheet" href="transit.css" type="text/css" media="all">
-#<link rel="stylesheet" href="http://i.yimg.jp/images/transit/09/v3/css/a020_cmb.css?v=201206" type="text/css" media="all">
-#</head>
-#<body>
-#<%= yield %>
-#</body></html>
-#'
-#end
-
 get '/' do
   haml :index
 end
@@ -51,15 +38,22 @@ agent.page.form_with(:name => 'train'){|form|
   form.click_button
 }
  
-# puts agent.page.css("#result_area_table") 
-#agent.page.search("table[@class='result_area_table']").each do |elem|
 bus_elem = agent.page.at("[@class='result_area_table']")
-#text
 @bus_text = bus_elem.inner_html
+@bus_time = @bus_text.scan(/(\d+):(\d+)/)
+@bus_fare =  @bus_text.scan(/(\d+円)/)
+@bus_fare = @bus_fare[0][0] #料金
+@bus_deptime = @bus_time[0].join(':') #出発時刻
+@bus_arrtime = @bus_time[1].join(':') #到着時刻
+
+busstat_elem = bus_elem.search("table[@class='result_area_section_table']")
+@bus_status = busstat_elem.pop.at('td').inner_html
+@bus_status.gsub!(/[\r\n\t]/,"") #バスの行き先＆現在位置のjavascript
+p @bus_status
+
 @bus_text = "<table>" + @bus_text + "</table>"
 @bus_text = @bus_text.sub(' width="60"',' width="75"') #時間
 @bus_text = @bus_text.sub(' width="335"',' width="300"')
-#bus_text = @bus_text.sub(' width="240"',' width="150"')
 @bus_text = @bus_text.sub(' width="240" class="result_area_fare_td2" align="right" colspan="2"',' width="150" align="left" colspan="2" style="padding-left:50px"')
 time_elem = bus_elem.search("tr[@class='result_area_tr']")
 bus_arvtime = time_elem.pop.at('td').inner_text
@@ -92,7 +86,7 @@ elem3 = agent.page.at("[@class='infomation2']")
 @infomation = @infomation + '<div class="infomation2">' + elem3.inner_html + '</div>'
 elem4 = agent.page.at("[@class='route-head']")
 @routehead = elem4.inner_html
-@routehead = @routehead.sub(/<ul class="service">.+<\/ul>/,"")
+@routehead = @routehead.sub(/<ul class="service">.*<\/ul>/m,"")
 #@infomation = '<div class="route-head">' + @routehead +  @infomation + '</div>'
 @infomation = '<div class="route-head">' + @routehead + '</div>'
 
